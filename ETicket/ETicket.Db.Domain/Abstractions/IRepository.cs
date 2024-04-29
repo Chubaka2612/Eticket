@@ -17,6 +17,7 @@ namespace ETicket.Db.Domain.Abstractions
         void Update(TEntity item);
 
         void Delete(TEntity item);
+
         void DeleteRange(IEnumerable<TEntity> items);
 
         IQueryable<TEntity> GetIncluding(params Expression<Func<TEntity, object>>[] includeProperties);
