@@ -20,26 +20,12 @@ namespace ETicket.Db.Dal.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Date = table.Column<DateTime>(type: "date", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Event", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Manifest",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    VenueId = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Manifest", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,7 +41,7 @@ namespace ETicket.Db.Dal.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Prices",
+                name: "Price",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -66,7 +52,7 @@ namespace ETicket.Db.Dal.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Prices", x => x.Id);
+                    table.PrimaryKey("PK_Price", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,31 +85,11 @@ namespace ETicket.Db.Dal.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Section",
+                name: "Venue",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ManifestId = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Section", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Section_Manifest_ManifestId",
-                        column: x => x.ManifestId,
-                        principalTable: "Manifest",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Venue",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -133,61 +99,26 @@ namespace ETicket.Db.Dal.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Venue", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Venue_Manifest_Id",
-                        column: x => x.Id,
-                        principalTable: "Manifest",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "Payment",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
-                    PaymentId = table.Column<long>(type: "bigint", nullable: false),
-                    EventId = table.Column<long>(type: "bigint", nullable: false),
+                    PaymentStatusId = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     Date = table.Column<DateTime>(type: "datetime", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.Id);
+                    table.PrimaryKey("PK_Payment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Order_Event_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Event",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Order_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Row",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<int>(type: "int", nullable: false),
-                    SectionId = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Row", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Row_Section_SectionId",
-                        column: x => x.SectionId,
-                        principalTable: "Section",
-                        principalColumn: "Id",
+                        name: "FK_Payment_PaymentStatus_PaymentStatusId",
+                        column: x => x.PaymentStatusId,
+                        principalTable: "PaymentStatus",
+                        principalColumn: "PaymentStatusId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -196,10 +127,7 @@ namespace ETicket.Db.Dal.Migrations
                 columns: table => new
                 {
                     VenueId = table.Column<long>(type: "bigint", nullable: false),
-                    EventId = table.Column<long>(type: "bigint", nullable: false),
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    EventId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -219,79 +147,81 @@ namespace ETicket.Db.Dal.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderItem",
+                name: "Manifest",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PriceId = table.Column<long>(type: "bigint", nullable: false),
-                    SeatId = table.Column<long>(type: "bigint", nullable: false),
-                    OrderId = table.Column<long>(type: "bigint", nullable: false),
+                    VenueId = table.Column<long>(type: "bigint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderItem", x => x.Id);
+                    table.PrimaryKey("PK_Manifest", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItem_Order_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Order",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderItem_Prices_PriceId",
-                        column: x => x.PriceId,
-                        principalTable: "Prices",
+                        name: "FK_Manifest_Venue_VenueId",
+                        column: x => x.VenueId,
+                        principalTable: "Venue",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Payment",
+                name: "Section",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    PaymentStatusId = table.Column<int>(type: "int", nullable: true),
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ManifestId = table.Column<long>(type: "bigint", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payment", x => x.Id);
+                    table.PrimaryKey("PK_Section", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Payment_Order_Id",
-                        column: x => x.Id,
-                        principalTable: "Order",
+                        name: "FK_Section_Manifest_ManifestId",
+                        column: x => x.ManifestId,
+                        principalTable: "Manifest",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Row",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SectionId = table.Column<long>(type: "bigint", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Row", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Payment_PaymentStatus_PaymentStatusId",
-                        column: x => x.PaymentStatusId,
-                        principalTable: "PaymentStatus",
-                        principalColumn: "PaymentStatusId");
+                        name: "FK_Row_Section_SectionId",
+                        column: x => x.SectionId,
+                        principalTable: "Section",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Seat",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false),
-                    Number = table.Column<int>(type: "int", nullable: false),
-                    RowId = table.Column<long>(type: "bigint", nullable: false),
-                    OrderItemId = table.Column<long>(type: "bigint", nullable: false),
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     SeatStatusId = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    RowId = table.Column<long>(type: "bigint", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Seat", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Seat_OrderItem_Id",
-                        column: x => x.Id,
-                        principalTable: "OrderItem",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Seat_Row_RowId",
                         column: x => x.RowId,
@@ -303,6 +233,54 @@ namespace ETicket.Db.Dal.Migrations
                         column: x => x.SeatStatusId,
                         principalTable: "SeatStatus",
                         principalColumn: "SeatStatusId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderItem",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    PaymentId = table.Column<long>(type: "bigint", nullable: false),
+                    EventId = table.Column<long>(type: "bigint", nullable: false),
+                    PriceId = table.Column<long>(type: "bigint", nullable: false),
+                    SeatId = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Payment_PaymentId",
+                        column: x => x.PaymentId,
+                        principalTable: "Payment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Price_PriceId",
+                        column: x => x.PriceId,
+                        principalTable: "Price",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Seat_SeatId",
+                        column: x => x.SeatId,
+                        principalTable: "Seat",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItem_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -333,24 +311,36 @@ namespace ETicket.Db.Dal.Migrations
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_EventId",
-                table: "Order",
+                name: "IX_Manifest_VenueId",
+                table: "Manifest",
+                column: "VenueId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItem_EventId",
+                table: "OrderItem",
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_UserId",
-                table: "Order",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderItem_OrderId",
+                name: "IX_OrderItem_PaymentId",
                 table: "OrderItem",
-                column: "OrderId");
+                column: "PaymentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItem_PriceId",
                 table: "OrderItem",
                 column: "PriceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItem_SeatId",
+                table: "OrderItem",
+                column: "SeatId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderItem_UserId",
+                table: "OrderItem",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payment_PaymentStatusId",
@@ -397,19 +387,25 @@ namespace ETicket.Db.Dal.Migrations
                 name: "EventVenue");
 
             migrationBuilder.DropTable(
+                name: "OrderItem");
+
+            migrationBuilder.DropTable(
+                name: "Event");
+
+            migrationBuilder.DropTable(
                 name: "Payment");
+
+            migrationBuilder.DropTable(
+                name: "Price");
 
             migrationBuilder.DropTable(
                 name: "Seat");
 
             migrationBuilder.DropTable(
-                name: "Venue");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "PaymentStatus");
-
-            migrationBuilder.DropTable(
-                name: "OrderItem");
 
             migrationBuilder.DropTable(
                 name: "Row");
@@ -418,22 +414,13 @@ namespace ETicket.Db.Dal.Migrations
                 name: "SeatStatus");
 
             migrationBuilder.DropTable(
-                name: "Order");
-
-            migrationBuilder.DropTable(
-                name: "Prices");
-
-            migrationBuilder.DropTable(
                 name: "Section");
 
             migrationBuilder.DropTable(
-                name: "Event");
-
-            migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "Manifest");
+
+            migrationBuilder.DropTable(
+                name: "Venue");
         }
     }
 }

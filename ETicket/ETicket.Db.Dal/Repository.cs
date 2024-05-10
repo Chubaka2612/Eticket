@@ -14,9 +14,9 @@ namespace ETicket.Db.Dal
             DataSet = dbContext.Set<TEntity>(); 
         }
 
-        public async Task<TEntity> FindAsync(params object[] keyValues)
+        public async Task<TEntity> FindAsync(CancellationToken cancellationToken, params object[] keyValues)
         {
-            return await DataSet.FindAsync(keyValues);
+            return await DataSet.FindAsync(keyValues, cancellationToken);
         }
 
         public virtual void Add(TEntity item)
@@ -39,7 +39,7 @@ namespace ETicket.Db.Dal
             DataSet.RemoveRange(items);
         }
 
-        public IQueryable<TEntity> GetIncluding(params Expression<Func<TEntity, object>>[] includeProperties)
+        public IQueryable<TEntity> Queryable(params Expression<Func<TEntity, object>>[] includeProperties)
         {
             IQueryable<TEntity> query = DataSet;
             if (includeProperties != null)
@@ -47,8 +47,19 @@ namespace ETicket.Db.Dal
                 query = includeProperties
                     .Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
             }
-
             return query;
         }
+
+        public IQueryable<TEntity> Queryable(string[] includeProperties)
+        {
+            IQueryable<TEntity> query = DataSet;
+            if (includeProperties != null)
+            {
+                query = includeProperties
+                    .Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+            }
+            return query;
+        }
+
     }
 }

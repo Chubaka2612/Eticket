@@ -13,6 +13,6 @@ namespace ETicket.Db.Domain.Entities
 
         public ICollection<EventVenue> EventVenues { get; set; }
 
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = null!;
     }
 }

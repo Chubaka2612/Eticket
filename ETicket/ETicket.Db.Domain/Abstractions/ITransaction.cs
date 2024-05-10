@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ETicket.Db.Domain.Abstractions
 {
-    public interface ITransaction 
+    public interface ITransaction : IDisposable
     {
         Task CommitAsync();
 

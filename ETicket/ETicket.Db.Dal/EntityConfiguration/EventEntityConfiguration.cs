@@ -14,13 +14,13 @@ namespace ETicket.Db.Dal.EntityConfiguration
                 .IsRequired();
 
             builder.Property(e => e.Date)
-                .HasColumnType("date")
+                .HasColumnType("datetime")
                 .IsRequired();
 
-            //builder
-            //    .HasMany(e => e.EventVenues)
-            //    .WithOne(e => e.Event)
-            //    .HasForeignKey(e => e.EventId);
+            builder
+                .HasMany(e => e.EventVenues)
+                .WithOne(e => e.Event)
+                .HasForeignKey(e => e.EventId);
 
             builder
                 .ToTable(typeof(Event).Name)

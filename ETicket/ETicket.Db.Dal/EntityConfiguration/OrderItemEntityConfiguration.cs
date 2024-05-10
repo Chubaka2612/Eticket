@@ -9,20 +9,28 @@ namespace ETicket.Db.Dal.EntityConfiguration
     {
         public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
-            builder
-                  .HasOne(e => e.Order)
-                  .WithMany(e => e.OrderItems)
-                  .HasForeignKey(e => e.OrderId);
+            builder.HasOne(e => e.User)
+                .WithMany(e => e.OrderItems)
+                .HasForeignKey(e => e.UserId);
+
+            builder.HasOne(e => e.Payment)
+                .WithMany(e => e.OrderItems)
+                .HasForeignKey(e => e.PaymentId);
 
             builder
-                  .HasOne(e => e.Price)
-                  .WithMany(e => e.OrderItems)
-                  .HasForeignKey(e => e.PriceId);
+                .HasOne(e => e.Event)
+                .WithMany(e => e.OrderItems)
+                .HasForeignKey(e => e.EventId);
 
             builder
-                  .HasOne(e => e.Seat)
-                  .WithOne(e => e.OrderItem)
-                  .HasForeignKey<Seat>(e => e.Id);
+                .HasOne(e => e.Price)
+                .WithMany(e => e.OrderItems)
+                .HasForeignKey(e => e.PriceId);
+
+            builder
+                .HasOne(e => e.Seat)
+                .WithOne(e => e.OrderItem)
+                .HasForeignKey<Seat>(e => e.Id);
 
             builder
                 .ToTable(typeof(OrderItem).Name)

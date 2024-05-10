@@ -22,5 +22,13 @@ namespace ETicket.Db.Dal
         {
             return _efTransaction.RollbackAsync();
         }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+
+            _efTransaction.Dispose();
+        }
+
     }
 }
