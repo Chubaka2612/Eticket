@@ -1,0 +1,54 @@
+﻿using ETicket.Db.Domain.Abstractions;
+using ETicket.Db.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+
+namespace ETicket.Db.Dal
+{
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
+    {
+        protected readonly DbSet<TEntity> DataSet;
+
+        public Repository(DbContext dbContext) 
+        { 
+            DataSet = dbContext.Set<TEntity>(); 
+        }
+
+        public async Task<TEntity> FindAsync(params object[] keyValues)
+        {
+            return await DataSet.FindAsync(keyValues);
+        }
+
+        public virtual void Add(TEntity item)
+        {
+            DataSet.Add(item);
+        }
+
+        public virtual void Update(TEntity item)
+        {
+            DataSet.Update(item);
+        }
+
+        public virtual void Delete(TEntity item)
+        {
+            DataSet.Remove(item);
+        }
+
+        public virtual void DeleteRange(IEnumerable<TEntity> items)
+        {
+            DataSet.RemoveRange(items);
+        }
+
+        public IQueryable<TEntity> GetIncluding(params Expression<Func<TEntity, object>>[] includeProperties)
+        {
+            IQueryable<TEntity> query = DataSet;
+            if (includeProperties != null)
+            {
+                query = includeProperties
+                    .Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+            }
+
+            return query;
+        }
+    }
+}
