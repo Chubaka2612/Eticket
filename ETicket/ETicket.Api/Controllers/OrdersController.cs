@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ETicket.Api.Controllers
 {
-
     [ApiController]
     [Route("api/eticket/orders")]
     public class OrdersController : ControllerBase

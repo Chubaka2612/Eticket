@@ -4,6 +4,7 @@ using ETicket.Bll.Services.Cart;
 using ETicket.Db.Dal;
 using ETicket.Db.Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace ETicket.Api
 {
@@ -27,7 +28,13 @@ namespace ETicket.Api
             services.AddDbContext<ETicketDbContext>(options =>
                 options.UseSqlServer(connection));
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
 
             services.AddScoped<IUnitOfWork, ETicketUnitOfWork>();
             services.AddScoped<IVenueService, VenueService>();
@@ -47,6 +54,9 @@ namespace ETicket.Api
             {
                 endpoints.MapControllers();
             });
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
     }

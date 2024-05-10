@@ -21,7 +21,7 @@ namespace ETicket.Bll.Services
             _seatRepository = _unitOfWork.Repository<Seat>();
         }
 
-        public async Task<IEnumerable<Seat>> GetEventSeatsBySectionAsync(long eventId, long sectionId, long venueId, CancellationToken cancellationToken)
+        public async Task<IEnumerable<BusinessSeat>> GetEventSeatsBySectionAsync(long eventId, long sectionId, long venueId, CancellationToken cancellationToken)
         {
             var eevent = await _eventRepository.Queryable(new[] 
             { 
@@ -41,7 +41,13 @@ namespace ETicket.Bll.Services
                 .Where(s => s.Row.Section.ManifestId == venue.Manifest.Id)
                 .ToListAsync(cancellationToken);
 
-            return seats;
+            return seats.Select(item => new BusinessSeat()
+            {
+                Id = item.Id,
+                Number = item.Number,
+                SeatStatus = item.SeatStatusId,
+                RowId = item.RowId,
+            }).ToList(); 
         }
 
         public async Task<PaginatedResult<Event>> GetEventsAsync(int skip, int limit, CancellationToken cancellationToken)

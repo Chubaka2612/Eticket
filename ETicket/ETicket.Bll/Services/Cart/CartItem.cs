@@ -3,13 +3,12 @@ namespace ETicket.Bll.Services.Cart
 {
     public class CartItem
     {
-        public CartItem(long eventId, long seatId, long priceId, long userId, DateTime addedAt)
+        public CartItem(long eventId, long seatId, long priceId, long userId)
         {
             EventId = eventId;
             SeatId = seatId;
             PriceId = priceId;
             UserId = userId;
-            AddedAt = addedAt;
         }
 
         public long UserId { get; }
@@ -19,7 +18,5 @@ namespace ETicket.Bll.Services.Cart
         public long SeatId { get; }
       
         public long PriceId { get; }
-
-        public DateTime AddedAt { get; }
     }
 }

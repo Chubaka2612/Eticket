@@ -7,6 +7,6 @@ namespace ETicket.Bll.Services
     {
         Task<PaginatedResult<Venue>> GetVenuesAsync(int skip, int limit, CancellationToken cancellationToken);
 
-        Task<IEnumerable<Section>> GetSectionsAsync(long venueId, CancellationToken cancellationToken);
+        Task<IEnumerable<BusinessSection>> GetSectionsAsync(long venueId, CancellationToken cancellationToken);
     }
 }

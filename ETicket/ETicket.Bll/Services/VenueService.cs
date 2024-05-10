@@ -3,7 +3,6 @@ using ETicket.Bll.Utils;
 using ETicket.Db.Domain.Abstractions;
 using ETicket.Db.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace ETicket.Bll.Services
 {
@@ -15,6 +14,7 @@ namespace ETicket.Bll.Services
 
         private readonly IRepository<Section> _sectionRepository;
 
+
         public VenueService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -22,16 +22,21 @@ namespace ETicket.Bll.Services
             _sectionRepository = _unitOfWork.Repository<Section>();
         }
 
-        public async Task<IEnumerable<Section>> GetSectionsAsync(long venueId, CancellationToken cancellationToken)
+        public async Task<IEnumerable<BusinessSection>> GetSectionsAsync(long venueId, CancellationToken cancellationToken)
         {
             var venue = await _venueRepository.Queryable(s => s.Manifest)
                 .SingleRequiredAsync(v => v.Id == venueId, cancellationToken);
 
             var sections = await _sectionRepository.Queryable()
                 .Where(s => s.ManifestId == venue.Manifest.Id)
-                .ToListAsync(cancellationToken);
 
-            return sections;
+                .Include(s => s.Rows)
+                .ToListAsync(cancellationToken);
+           return sections.Select(item => new BusinessSection()
+           {
+               Id = item.Id,
+               Name = item.Name
+            }).ToList();
         }
 
         public async Task<PaginatedResult<Venue>> GetVenuesAsync(int skip, int limit, CancellationToken cancellationToken)

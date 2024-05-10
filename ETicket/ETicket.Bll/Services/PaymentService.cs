@@ -17,7 +17,6 @@ namespace ETicket.Bll.Services
         {
             _unitOfWork = unitOfWork;
             _paymnetRepository = _unitOfWork.Repository<Payment>();
-         
         }
    
         public async Task<PaymentState> GetPaymentStateAsync(long paymentId, CancellationToken cancellationToken)
@@ -25,9 +24,11 @@ namespace ETicket.Bll.Services
             var payment = await _paymnetRepository.Queryable()
                .SingleRequiredAsync(p => p.Id == paymentId, cancellationToken);
 
-            return new PaymentState {
+            return new PaymentState
+            {
                 Id = paymentId, 
-                Status = payment.PaymentStatusId};
+                Status = payment.PaymentStatusId
+            };
         }
 
         public async Task CompletePaymentAsync(long paymentId, CancellationToken cancellationToken)

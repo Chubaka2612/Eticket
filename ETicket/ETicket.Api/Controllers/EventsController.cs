@@ -25,13 +25,19 @@ namespace ETicket.Api.Controllers
             return Ok(venuesResponse);
         }
 
-        //TODO: endless query on Manifest but service layer is working fine
+
         [HttpGet("{eventId}/venues/{venueId}/sections/{sectionId}/seats")]
         public async Task<IActionResult> GetSections([FromRoute] long eventId, [FromRoute] long venueId, [FromRoute] long sectionId, CancellationToken cancellationToken)
         {
-            var response = await _eventService.GetEventSeatsBySectionAsync(eventId: eventId, sectionId: sectionId, venueId: venueId, cancellationToken);
-            
-            return Ok(response);
+            try
+            {
+                var response = await _eventService.GetEventSeatsBySectionAsync(eventId: eventId, sectionId: sectionId, venueId: venueId, cancellationToken);
+                return Ok(response);
+            } 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

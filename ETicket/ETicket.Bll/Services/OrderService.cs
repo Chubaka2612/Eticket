@@ -27,13 +27,14 @@ namespace ETicket.Bll.Services
 
         public IEnumerable<BusinessOrderItem> GetCartItems(Guid cartId)
         {
-            var cart = _cartStorage.Get(cartId);
+            var cart = _cartStorage.Get(cartId) ?? throw new ArgumentException($"Cart with id {cartId} doesn't exist");
 
             return cart.Items.Values.Select(item => new BusinessOrderItem()
             {
                 EventId = item.EventId,
                 SeatId = item.SeatId,
                 PriceId = item.PriceId,
+                UserId = item.UserId,
             }).ToList();
         }
 
