@@ -18,8 +18,6 @@ namespace ETicket.Db.Dal
 
         public virtual DbSet<Manifest> Manifests { get; set; }
 
-        public virtual DbSet<Order> Orders { get; set; }
-
         public virtual DbSet<OrderItem> OrderItems { get; set; }
 
         public virtual DbSet<Payment> Payments { get; set; }
@@ -44,7 +42,6 @@ namespace ETicket.Db.Dal
         {
             modelBuilder.ApplyConfiguration(new EventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ManifestEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new OrderEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OrderItemEntityConfiguration());
             modelBuilder.ApplyConfiguration(new PaymentEntityConfiguration());
             modelBuilder.ApplyConfiguration(new PaymentStatusEntityConfiguration());
@@ -71,6 +68,17 @@ namespace ETicket.Db.Dal
                     e.HasKey(t => new { t.VenueId, t.EventId });
                     e.ToTable(nameof(EventVenue));
                 });
+
+            modelBuilder.Entity<Venue>()
+                .HasOne(s => s.Manifest)
+                .WithOne(ad => ad.Venue)
+                .HasForeignKey<Manifest>(ad => ad.VenueId);
+
+            modelBuilder.Entity<Seat>()
+               .HasOne(s => s.OrderItem)
+               .WithOne(ad => ad.Seat)
+               .HasForeignKey<OrderItem>(ad => ad.SeatId);
+
         }
     }
 }

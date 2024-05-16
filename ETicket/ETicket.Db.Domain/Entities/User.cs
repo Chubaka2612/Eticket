@@ -12,6 +12,6 @@ namespace ETicket.Db.Domain.Entities
 
         public string Email { get; set; }
 
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual ICollection<OrderItem> OrderItems { get; set; }
     }
 }

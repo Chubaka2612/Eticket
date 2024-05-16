@@ -11,7 +11,7 @@ namespace ETicket.Db.Dal.EntityConfiguration
         public void Configure(EntityTypeBuilder<Payment> builder)
         {
             builder
-                .Property(e => e.PaymentStatus)
+                .Property(e => e.PaymentStatusId)
                 .HasConversion<int>()
                 .HasDefaultValue(PaymentStatusOption.New)
                 .IsRequired();

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ETicket.Db.Dal.Migrations
 {
     [DbContext(typeof(ETicketDbContext))]
-    [Migration("20240424221750_UpdatePriceEntityName")]
-    partial class UpdatePriceEntityName
+    [Migration("20240509145832_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace ETicket.Db.Dal.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Event", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Event", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -37,7 +37,7 @@ namespace ETicket.Db.Dal.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -49,22 +49,13 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Event", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.EventVenue", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.EventVenue", b =>
                 {
                     b.Property<long>("VenueId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("EventId")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.HasKey("VenueId", "EventId");
 
@@ -73,7 +64,7 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("EventVenue", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Manifest", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Manifest", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,10 +80,13 @@ namespace ETicket.Db.Dal.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("VenueId")
+                        .IsUnique();
+
                     b.ToTable("Manifest", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Order", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.OrderItem", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -103,13 +97,16 @@ namespace ETicket.Db.Dal.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime");
-
                     b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PaymentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PriceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SeatId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("UserId")
@@ -119,12 +116,19 @@ namespace ETicket.Db.Dal.Migrations
 
                     b.HasIndex("EventId");
 
+                    b.HasIndex("PaymentId");
+
+                    b.HasIndex("PriceId");
+
+                    b.HasIndex("SeatId")
+                        .IsUnique();
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Order", (string)null);
+                    b.ToTable("OrderItem", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.OrderItem", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Payment", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -135,43 +139,13 @@ namespace ETicket.Db.Dal.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("OrderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PriceId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SeatId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("PriceId");
-
-                    b.ToTable("OrderItem", (string)null);
-                });
-
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Payment", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime");
 
-                    b.Property<int>("PaymentStatus")
+                    b.Property<int>("PaymentStatusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
-
-                    b.Property<int?>("PaymentStatusId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -180,7 +154,7 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Payment", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.PaymentStatus", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.PaymentStatus", b =>
                 {
                     b.Property<int>("PaymentStatusId")
                         .HasColumnType("int");
@@ -210,7 +184,7 @@ namespace ETicket.Db.Dal.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Price", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Price", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -235,7 +209,7 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Price", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Row", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Row", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -259,20 +233,19 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Row", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Seat", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Seat", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Number")
                         .HasColumnType("int");
-
-                    b.Property<long>("OrderItemId")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("RowId")
                         .HasColumnType("bigint");
@@ -291,7 +264,7 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Seat", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.SeatStatus", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.SeatStatus", b =>
                 {
                     b.Property<int>("SeatStatusId")
                         .HasColumnType("int");
@@ -326,7 +299,7 @@ namespace ETicket.Db.Dal.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Section", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Section", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -352,7 +325,7 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Section", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.User", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -394,11 +367,13 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Venue", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Venue", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -428,15 +403,15 @@ namespace ETicket.Db.Dal.Migrations
                     b.ToTable("Venue", (string)null);
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.EventVenue", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.EventVenue", b =>
                 {
-                    b.HasOne("ETicket.Db.Domain.Models.Event", "Event")
+                    b.HasOne("ETicket.Db.Domain.Entities.Event", "Event")
                         .WithMany("EventVenues")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ETicket.Db.Domain.Models.Venue", "Venue")
+                    b.HasOne("ETicket.Db.Domain.Entities.Venue", "Venue")
                         .WithMany("EventVenues")
                         .HasForeignKey("VenueId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -447,62 +422,74 @@ namespace ETicket.Db.Dal.Migrations
                     b.Navigation("Venue");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Order", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Manifest", b =>
                 {
-                    b.HasOne("ETicket.Db.Domain.Models.Event", "Event")
-                        .WithMany("Orders")
+                    b.HasOne("ETicket.Db.Domain.Entities.Venue", "Venue")
+                        .WithOne("Manifest")
+                        .HasForeignKey("ETicket.Db.Domain.Entities.Manifest", "VenueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Venue");
+                });
+
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.OrderItem", b =>
+                {
+                    b.HasOne("ETicket.Db.Domain.Entities.Event", "Event")
+                        .WithMany("OrderItems")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ETicket.Db.Domain.Models.User", "User")
-                        .WithMany("Orders")
+                    b.HasOne("ETicket.Db.Domain.Entities.Payment", "Payment")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ETicket.Db.Domain.Entities.Price", "Price")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("PriceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ETicket.Db.Domain.Entities.Seat", "Seat")
+                        .WithOne("OrderItem")
+                        .HasForeignKey("ETicket.Db.Domain.Entities.OrderItem", "SeatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ETicket.Db.Domain.Entities.User", "User")
+                        .WithMany("OrderItems")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Event");
 
+                    b.Navigation("Payment");
+
+                    b.Navigation("Price");
+
+                    b.Navigation("Seat");
+
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.OrderItem", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Payment", b =>
                 {
-                    b.HasOne("ETicket.Db.Domain.Models.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ETicket.Db.Domain.Models.Price", "Price")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("PriceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Price");
-                });
-
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Payment", b =>
-                {
-                    b.HasOne("ETicket.Db.Domain.Models.Order", "Order")
-                        .WithOne("Payment")
-                        .HasForeignKey("ETicket.Db.Domain.Models.Payment", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ETicket.Db.Domain.Models.PaymentStatus", null)
+                    b.HasOne("ETicket.Db.Domain.Entities.PaymentStatus", "PaymentStatus")
                         .WithMany("Payments")
-                        .HasForeignKey("PaymentStatusId");
+                        .HasForeignKey("PaymentStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("PaymentStatus");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Row", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Row", b =>
                 {
-                    b.HasOne("ETicket.Db.Domain.Models.Section", "Section")
+                    b.HasOne("ETicket.Db.Domain.Entities.Section", "Section")
                         .WithMany("Rows")
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -511,36 +498,28 @@ namespace ETicket.Db.Dal.Migrations
                     b.Navigation("Section");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Seat", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Seat", b =>
                 {
-                    b.HasOne("ETicket.Db.Domain.Models.OrderItem", "OrderItem")
-                        .WithOne("Seat")
-                        .HasForeignKey("ETicket.Db.Domain.Models.Seat", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ETicket.Db.Domain.Models.Row", "Row")
+                    b.HasOne("ETicket.Db.Domain.Entities.Row", "Row")
                         .WithMany("Seats")
                         .HasForeignKey("RowId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ETicket.Db.Domain.Models.SeatStatus", "SeatStatus")
+                    b.HasOne("ETicket.Db.Domain.Entities.SeatStatus", "SeatStatus")
                         .WithMany("Seats")
                         .HasForeignKey("SeatStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("OrderItem");
 
                     b.Navigation("Row");
 
                     b.Navigation("SeatStatus");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Section", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Section", b =>
                 {
-                    b.HasOne("ETicket.Db.Domain.Models.Manifest", "Manifest")
+                    b.HasOne("ETicket.Db.Domain.Entities.Manifest", "Manifest")
                         .WithMany("Sections")
                         .HasForeignKey("ManifestId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -549,76 +528,63 @@ namespace ETicket.Db.Dal.Migrations
                     b.Navigation("Manifest");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Venue", b =>
-                {
-                    b.HasOne("ETicket.Db.Domain.Models.Manifest", "Manifest")
-                        .WithOne("Venue")
-                        .HasForeignKey("ETicket.Db.Domain.Models.Venue", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Manifest");
-                });
-
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Event", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Event", b =>
                 {
                     b.Navigation("EventVenues");
 
-                    b.Navigation("Orders");
+                    b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Manifest", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Manifest", b =>
                 {
                     b.Navigation("Sections");
-
-                    b.Navigation("Venue");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Order", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Payment", b =>
                 {
                     b.Navigation("OrderItems");
-
-                    b.Navigation("Payment");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.OrderItem", b =>
-                {
-                    b.Navigation("Seat");
-                });
-
-            modelBuilder.Entity("ETicket.Db.Domain.Models.PaymentStatus", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.PaymentStatus", b =>
                 {
                     b.Navigation("Payments");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Price", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Price", b =>
                 {
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Row", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Row", b =>
                 {
                     b.Navigation("Seats");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.SeatStatus", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Seat", b =>
+                {
+                    b.Navigation("OrderItem");
+                });
+
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.SeatStatus", b =>
                 {
                     b.Navigation("Seats");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Section", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Section", b =>
                 {
                     b.Navigation("Rows");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.User", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.User", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("ETicket.Db.Domain.Models.Venue", b =>
+            modelBuilder.Entity("ETicket.Db.Domain.Entities.Venue", b =>
                 {
                     b.Navigation("EventVenues");
+
+                    b.Navigation("Manifest");
                 });
 #pragma warning restore 612, 618
         }

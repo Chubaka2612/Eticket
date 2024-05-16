@@ -26,10 +26,10 @@ namespace ETicket.Db.Dal.EntityConfiguration
                    .HasMaxLength(255)
                    .IsRequired();
 
-            //builder
-            //    .HasMany(e => e.EventVenues)
-            //    .WithOne(e => e.Venue)
-            //    .HasForeignKey(e => e.VenueId);
+            builder
+                .HasMany(e => e.EventVenues)
+                .WithOne(e => e.Venue)
+                .HasForeignKey(e => e.VenueId);
 
             builder
                 .ToTable(typeof(Venue).Name)
