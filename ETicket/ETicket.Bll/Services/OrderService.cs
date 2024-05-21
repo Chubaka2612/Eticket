@@ -75,10 +75,7 @@ namespace ETicket.Bll.Services
                         $" since it was not found in cart with id: {cartId}");
                 }
             }
-            else 
-            {
-                _cartStorage.Remove(cartId);
-            }
+            if (cart.Items.Count == 0) { _cartStorage.Remove(cartId); }
         }
 
         public async Task<long> BookCartSeatsAsync(Guid cartId, CancellationToken cancellationToken)
