@@ -19,14 +19,6 @@ namespace ETicket.Tests.Integration
     {
         InMemoryWebFactory webFactory;
         HttpClient httpClient;
-      
-
-        [OneTimeSetUp]
-        public async Task Setup()
-        {
-            webFactory = new InMemoryWebFactory("TicketsOrderingProcessIntegrationTests");
-            httpClient = webFactory.CreateNoRedirectClient();
-        }
 
         [Test]
         [TestCaseSource(nameof(PaymentOptionSource))]
@@ -35,6 +27,10 @@ namespace ETicket.Tests.Integration
             var expectedPaymentStatus = paymentSet.Key;
             var expectedSeatStatus = paymentSet.Value;
 
+            webFactory = new InMemoryWebFactory($"TicketsOrdering{expectedPaymentStatus}ProcessIntegrationTests");
+            httpClient = webFactory.CreateNoRedirectClient();
+
+          
             var testEvent = TestDataFactory.GetStubEvent1();
             var testVenue = TestDataFactory.GetStubVenue1();
             var testSection = TestDataFactory.GetStubSection1();
@@ -93,7 +89,6 @@ namespace ETicket.Tests.Integration
             Assert.That(bookedPreviouslySeats.Select(s => s.SeatStatus), Is.All.EqualTo(expectedSeatStatus));
         }
 
-       
         protected static IEnumerable<TestCaseData> PaymentOptionSource()
         {
             var sourceList = new Dictionary<PaymentStatusOption, SeatStatusOption>
