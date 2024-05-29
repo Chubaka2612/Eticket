@@ -2,11 +2,13 @@
 using ETicket.Bll.Services;
 using ETicket.Db.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace ETicket.Api.Controllers
 {
     [ApiController]
     [Route("api/eticket/events")]
+
     public class EventsController: ControllerBase
     {
         private readonly IEventService _eventService;
@@ -17,6 +19,7 @@ namespace ETicket.Api.Controllers
         }
 
         [HttpGet]
+        [OutputCache(Tags = ["Events"])]
         public async Task<IActionResult> GetEvents([FromQuery] PaginatedRequest request, CancellationToken cancellationToken)
         {
             var paginatedResult = await _eventService.GetEventsAsync(request.Skip, request.Limit, cancellationToken);
@@ -27,6 +30,7 @@ namespace ETicket.Api.Controllers
 
 
         [HttpGet("{eventId}/venues/{venueId}/sections/{sectionId}/seats")]
+        [OutputCache(Tags = ["Events"] )]
         public async Task<IActionResult> GetSections([FromRoute] long eventId, [FromRoute] long venueId, [FromRoute] long sectionId, CancellationToken cancellationToken)
         {
             try
