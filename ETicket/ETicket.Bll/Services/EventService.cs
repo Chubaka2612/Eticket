@@ -33,11 +33,12 @@ namespace ETicket.Bll.Services
 
             var seats = await _seatRepository.Queryable(new[]
             {
-                    nameof(Seat.Row),
-                    $"{nameof(Seat.Row)}.{nameof(Row.Section)}",
-                      $"{nameof(Seat.OrderItem)}",
-                      $"{nameof(Seat.OrderItem)}.{nameof(OrderItem.Price)}"
-                })
+                nameof(Seat.Row),
+                $"{nameof(Seat.Row)}.{nameof(Row.Section)}",
+                $"{nameof(Seat.OrderItem)}",
+                $"{nameof(Seat.OrderItem)}.{nameof(OrderItem.Price)}"
+            })
+                .Where(s => s.Row.Section.Id == sectionId)
                 .Where(s => s.Row.Section.ManifestId == venue.Manifest.Id)
                 .ToListAsync(cancellationToken);
 
