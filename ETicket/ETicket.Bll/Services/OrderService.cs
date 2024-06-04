@@ -99,6 +99,10 @@ namespace ETicket.Bll.Services
 
                 foreach (var seat in seats)
                 {
+                    if (seat.SeatStatusId != SeatStatusOption.Available)
+                    {
+                        throw new InvalidOperationException($"Cannot book a seat with the id '{seat.Id}' since it's already 'Booked'.");
+                    }
                     seat.SeatStatusId = SeatStatusOption.Booked;
                 }
                 var cartItemMap = cartItems.ToDictionary(item => item.SeatId);

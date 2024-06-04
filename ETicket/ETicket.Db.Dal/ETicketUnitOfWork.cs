@@ -1,6 +1,8 @@
 ﻿
 using ETicket.Db.Domain.Abstractions;
 using ETicket.Db.Domain.Entities;
+using System.Data;
+using Microsoft.EntityFrameworkCore; 
 
 namespace ETicket.Db.Dal
 {
@@ -20,7 +22,7 @@ namespace ETicket.Db.Dal
 
         public ITransaction BeginTransaction()
         {
-            return new Transaction(_context.Database.BeginTransaction());
+            return new Transaction(_context.Database.BeginTransaction(IsolationLevel.Serializable));
         }
 
         public Task SaveChangesAsync()
