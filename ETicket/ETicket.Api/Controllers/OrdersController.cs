@@ -64,9 +64,9 @@ namespace ETicket.Api.Controllers
                 var paymentInfo = await _orderService.BookCartSeatsAsync(Guid.Parse(cartId), cancellationToken);
                 return Ok(paymentInfo);
             }
-            catch (ArgumentException ex1)
+            catch (Exception ex)
             {
-                return NotFound(ex1);
+                return Conflict(ex.Message);
             }
 
         }
