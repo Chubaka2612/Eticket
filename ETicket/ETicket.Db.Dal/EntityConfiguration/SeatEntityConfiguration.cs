@@ -27,6 +27,9 @@ namespace ETicket.Db.Dal.EntityConfiguration
             builder
                 .ToTable(typeof(Seat).Name)
                 .HasKey(e => e.Id);
+
+            builder.Property(s => s.Version)
+                .IsRowVersion();//Concurrency token
         }
     }
 }
