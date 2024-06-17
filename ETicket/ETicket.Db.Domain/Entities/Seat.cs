@@ -15,5 +15,7 @@ namespace ETicket.Db.Domain.Entities
         public Row Row { get; set; }
 
         public SeatStatus SeatStatus { get; set; }
+
+        public byte[] Version { get; set; }
     }
 }
