@@ -1,5 +1,5 @@
 ﻿using ETicket.Bll.Models;
-using ETicket.Bll.Services.Cashing;
+using ETicket.Bll.Services.Caching;
 using ETicket.Db.Domain.Entities;
 
 namespace ETicket.Bll.Services

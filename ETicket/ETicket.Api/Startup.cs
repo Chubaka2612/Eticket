@@ -1,7 +1,10 @@
 ﻿
+using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using ETicket.Bll.Services;
+using ETicket.Bll.Services.Caching;
 using ETicket.Bll.Services.Cart;
-using ETicket.Bll.Services.Cashing;
+using ETicket.Bll.Services.Notifications;
 using ETicket.Db.Dal;
 using ETicket.Db.Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +73,13 @@ namespace ETicket.Api
             services.AddOutputCache(opt => opt.AddBasePolicy(builder => builder.Expire(cacheExpiration)));
             services.AddStackExchangeRedisOutputCache(options => options.Configuration = redisConnection);
 
+            services.AddSingleton<ServiceBusClient>(provider =>
+            {
+                var credential = new DefaultAzureCredential(includeInteractiveCredentials: true);
+                return new ServiceBusClient("eticketsns.servicebus.windows.net", credential);
+            });
+
+            services.AddSingleton<INotificationProducer, NotificationProducer>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

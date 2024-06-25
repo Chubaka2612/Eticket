@@ -1,5 +1,4 @@
-﻿using AutomotivePlatform.PLI.WebPortal.API.IntegrationTests;
-using ETicket.Bll.Models;
+﻿using ETicket.Bll.Models;
 using ETicket.Db.Domain.Abstractions;
 using ETicket.Db.Domain.Entities;
 using ETicket.Db.Domain.Enums;
