@@ -1,0 +1,161 @@
+﻿<html>
+<head>
+
+    <title>ETicket</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eeeeee;
+            font-family: 'Open Sans', sans-serif, Helvetica, Arial;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+
+        .header, .footer {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header {
+            background: #76ce3e;
+        }
+
+            .header h1 {
+                color: #ffffff;
+                margin: 0;
+            }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+            .content p {
+                margin: 5px 0;
+            }
+
+        .call-to-action {
+            border-radius: 40px;
+            padding: 15px 20px;
+            margin: 10px auto;
+            background: #76ce3e;
+            display: inline-block;
+        }
+
+            .call-to-action a {
+                color: #fff;
+                text-decoration: none;
+            }
+
+        .ticket-info {
+            margin: 20px 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .footer {
+            background: #2B2E34;
+            color: #ffffff;
+        }
+
+            .footer h2 {
+                margin-top: 0;
+            }
+
+            .footer p {
+                font-size: 14px;
+            }
+
+        @media only screen and (max-width: 480px) {
+            table tr td {
+                width: 100% !important;
+                float: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <center>
+        <!-- Top Message -->
+        <p style="text-align: center; color: #666666; font-size: 12px; margin: 10px 0;">
+            If you can't see this message <a href="#" target="_blank">View it in your browser</a>.
+        </p>
+
+        <!-- Main Container -->
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <h1>This is your E-TICKET</h1>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <p style="font-size: 30px; margin: 5px;">Thank you!</p>
+                <p>Your order No. @{param:order_number} successfully paid!</p>
+                <div class="call-to-action">
+                    <a href="tel:8888888888">Call Us (888) 888-8888</a>
+                </div>
+            </div>
+
+            <!-- Ticket Info -->
+            <div class="content">
+
+                @{param:tickets_section}
+
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="50%" style="padding: 10px; text-align: left;" valign="top">
+                            <h2>About us</h2>
+                            <p>Our mission is to create a community of event enthusiasts who can easily access the events they love. With advanced search options, personalized recommendations, and secure payment gateways, we make the ticket-buying process smooth and enjoyable. Our dedicated customer support team is always here to assist you with any queries or concerns, ensuring you have a fantastic experience from start to finish.</p>
+                        </td>
+                        <td width="50%" style="padding: 10px; text-align: left;" valign="top">
+                            <h2>Contact us</h2>
+                            <table border="0" style="font-size: 14px;">
+                                <tr>
+                                    <td>Call: (888) 888-8888</td>
+                                </tr>
+                                <tr>
+                                    <td>Email: eticket@learning.com</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bottom Message -->
+        <p style="text-align: center; color: #666666; font-size: 12px; margin: 10px 0;">
+            Copyright ©  @{param:current_year}. All rights reserved.<br />
+            If you do not want to receive emails from us, you can <a href="#" target="_blank">unsubscribe</a>.
+        </p>
+    </center>
+
+</body>
+</html>

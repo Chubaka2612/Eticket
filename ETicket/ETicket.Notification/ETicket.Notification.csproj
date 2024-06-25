@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\CheckedOutTicketEmailTemplate.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\CheckedOutTicketEmailTemplate.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.5" />
+    <PackageReference Include="MailKit" Version="4.6.0" />
+    <PackageReference Include="mailslurp" Version="15.19.22" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ETicket.Messaging\ETicket.Messaging.csproj" />
+    <ProjectReference Include="..\ETicket.Utils\ETicket.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

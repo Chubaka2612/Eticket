@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Net.Http;
 
-namespace AutomotivePlatform.PLI.WebPortal.API.IntegrationTests
+namespace ETicket.Tests.Integration
 {
     public class InMemoryWebFactory : WebApplicationFactory<Startup>
     {
