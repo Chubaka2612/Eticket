@@ -1,16 +1,19 @@
 ﻿
-using Azure.Identity;
 using Azure.Messaging.ServiceBus;
+using ETicket.Api.HealthCheck;
 using ETicket.Bll.Services;
 using ETicket.Bll.Services.Caching;
 using ETicket.Bll.Services.Cart;
 using ETicket.Bll.Services.Notifications;
 using ETicket.Db.Dal;
 using ETicket.Db.Domain.Abstractions;
+using IWent.Services.Notifications.Configuration;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text.Json.Serialization;
 
 namespace ETicket.Api
@@ -72,26 +75,32 @@ namespace ETicket.Api
                 redisOption.Configuration = redisConnection;
             });
 
+            services.AddTransient(services =>
+            {
+                var configuration = services.GetRequiredService<IConfiguration>();
+                return configuration.GetRequiredSection("ServiceBus").Get<ServiceBusConfiguration>()
+                    ?? throw new InvalidOperationException($"Unable to get the '{typeof(ServiceBusConfiguration)}' from configuration.");
+            });
+
             services.AddSingleton(typeof(ICacheService), typeof(CacheService));
 
             var cacheExpiration = Configuration.GetRequiredSection("Caching").Get<CacheConfiguration>().SlidingExpirationTimeSpan;
             services.AddOutputCache(opt => opt.AddBasePolicy(builder => builder.Expire(cacheExpiration)));
             services.AddStackExchangeRedisOutputCache(options => options.Configuration = redisConnection);
 
-            //services.AddSingleton<ServiceBusClient>(provider =>
-            //{
-            //    var credential = new DefaultAzureCredential(includeInteractiveCredentials: true);
-            //    return new ServiceBusClient("eticketsns.servicebus.windows.net", credential);
-            //});
-
-            services.AddSingleton<ServiceBusClient>(provider =>
+            var serviceBusConnectionString = Configuration.GetRequiredSection("ServiceBus").Get<ServiceBusConfiguration>().ConnectionString;
+            services.AddSingleton(provider =>
             {
-               
-                return new ServiceBusClient("Endpoint=sb://eticketsns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=ffWxtTt8QZeMgjb4vLg6eucR1L/cGdxlW+ASbLOAORk=");
+                return new ServiceBusClient(serviceBusConnectionString);
             });
 
-
             services.AddSingleton<INotificationProducer, NotificationProducer>();
+
+            services.AddHealthChecks()
+                .AddCheck("SqlServerHealthCheck", new SqlServerHealthCheck(connection))
+                .AddCheck("ServiceBusQueueHealthCheck", new AzureServiceBusHealthCheck(serviceBusConnectionString,
+                 Configuration.GetRequiredSection("ServiceBus").Get<ServiceBusConfiguration>().QueueName), HealthStatus.Unhealthy);
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -107,6 +116,30 @@ namespace ETicket.Api
                 endpoints.MapControllers();
             });
 
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                {
+                    ResponseWriter = async (context, report) =>
+                    {
+                        context.Response.ContentType = "application/json";
+
+                        var response = new
+                        {
+                            status = report.Status.ToString(),
+                            applicationVersion = typeof(Startup).Assembly.GetName().Version.ToString(),
+                            dependencies = report.Entries.Select(e => new
+                            {
+                                name = e.Key,
+                                status = e.Value.Status.ToString(),
+                                description = e.Value.Description
+                            }).ToArray()
+                        };
+
+                        await context.Response.WriteAsJsonAsync(response);
+                    }
+                });
+            });
             app.UseSwagger();
             app.UseSwaggerUI();
         }

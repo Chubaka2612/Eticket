@@ -7,6 +7,7 @@ using ETicket.Db.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using ETicket.Messaging.Models;
 using ETicket.Messaging.Enums;
+using IWent.Services.Notifications.Configuration;
 
 
 namespace ETicket.Bll.Services
@@ -14,15 +15,16 @@ namespace ETicket.Bll.Services
     public class PaymentService : IPaymentService
     {
         private readonly IUnitOfWork _unitOfWork;
-
+        private readonly ServiceBusConfiguration _busConfiguration;
         private readonly IRepository<Payment> _paymnetRepository;
         private readonly INotificationProducer _notificationProducer;
 
-        public PaymentService(IUnitOfWork unitOfWork, INotificationProducer notificationProducer)
+        public PaymentService(IUnitOfWork unitOfWork, ServiceBusConfiguration serviceBusConfiguration, INotificationProducer notificationProducer)
         {
             _unitOfWork = unitOfWork;
             _paymnetRepository = _unitOfWork.Repository<Payment>();
             _notificationProducer = notificationProducer;
+            _busConfiguration = serviceBusConfiguration;
         }
 
         public async Task<PaymentState> GetPaymentStateAsync(long paymentId, CancellationToken cancellationToken)
@@ -94,7 +96,7 @@ namespace ETicket.Bll.Services
                 // Produce notification and send to Message Queue 
                 var notification = BuildNotification(payment);
 
-                await _notificationProducer.PublishMessageAsync(notification, "notificationsqueue", cancellationToken);
+                await _notificationProducer.PublishMessageAsync(notification, _busConfiguration.QueueName, cancellationToken);
             }
             catch 
             {
