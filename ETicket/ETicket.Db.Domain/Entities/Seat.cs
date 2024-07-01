@@ -1,4 +1,5 @@
 ﻿using ETicket.Db.Domain.Enums;
+using System;
 
 namespace ETicket.Db.Domain.Entities
 {
@@ -16,6 +17,6 @@ namespace ETicket.Db.Domain.Entities
 
         public SeatStatus SeatStatus { get; set; }
 
-        public byte[] Version { get; set; }
+        public Int64 Version { get; set; }
     }
 }

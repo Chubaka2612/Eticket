@@ -50,10 +50,10 @@ namespace ETicket.Bll.Services
         private async Task UpdatePaymentAndSeatsStatusTransaction(long paymentId, PaymentStatusOption toUpdatePaymentStatus, SeatStatusOption toUpdateSeatStatus, CancellationToken cancellationToken)
         {
             using var transaction = _unitOfWork.BeginTransaction();
-
+            Payment payment = null;
             try
             {
-                var payment = await _paymnetRepository.Queryable()
+                 payment = await _paymnetRepository.Queryable()
                     .Where(p => p.Id == paymentId)
                     .Include(p => p.OrderItems)
                     .ThenInclude(p => p.Price)
@@ -83,15 +83,21 @@ namespace ETicket.Bll.Services
                 await _unitOfWork.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+            try
+            {
                 // Produce notification and send to Message Queue 
                 var notification = BuildNotification(payment);
 
                 await _notificationProducer.PublishMessageAsync(notification, "notificationsqueue", cancellationToken);
             }
-            catch
+            catch 
             {
-                await transaction.RollbackAsync();
                 throw;
             }
         }

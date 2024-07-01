@@ -10,6 +10,7 @@ using ETicket.Db.Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 
 namespace ETicket.Api
@@ -22,7 +23,7 @@ namespace ETicket.Api
         {
             configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddUserSecrets<Startup>()
+                //.AddUserSecrets<Startup>()
                 .Build();
 
             Configuration = configuration;
@@ -30,7 +31,11 @@ namespace ETicket.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection = Configuration.GetConnectionString("ETicketDb");
+            var connection =
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production" ?
+                Configuration.GetConnectionString("ETicketDbProd") :
+                Configuration.GetConnectionString("ETicketDb");
+
             services.AddDbContext<ETicketDbContext>(options =>
                 options.UseSqlServer(connection));
 
@@ -73,11 +78,18 @@ namespace ETicket.Api
             services.AddOutputCache(opt => opt.AddBasePolicy(builder => builder.Expire(cacheExpiration)));
             services.AddStackExchangeRedisOutputCache(options => options.Configuration = redisConnection);
 
+            //services.AddSingleton<ServiceBusClient>(provider =>
+            //{
+            //    var credential = new DefaultAzureCredential(includeInteractiveCredentials: true);
+            //    return new ServiceBusClient("eticketsns.servicebus.windows.net", credential);
+            //});
+
             services.AddSingleton<ServiceBusClient>(provider =>
             {
-                var credential = new DefaultAzureCredential(includeInteractiveCredentials: true);
-                return new ServiceBusClient("eticketsns.servicebus.windows.net", credential);
+               
+                return new ServiceBusClient("Endpoint=sb://eticketsns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=ffWxtTt8QZeMgjb4vLg6eucR1L/cGdxlW+ASbLOAORk=");
             });
+
 
             services.AddSingleton<INotificationProducer, NotificationProducer>();
         }
