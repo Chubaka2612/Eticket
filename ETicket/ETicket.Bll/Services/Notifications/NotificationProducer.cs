@@ -45,14 +45,6 @@ namespace ETicket.Bll.Services.Notifications
                 _logger.LogError(ex, "An exception occurred when sending a message to the queue '{QueueName}'", queueName);
                 throw;
             }
-            //finally
-            //{
-            //    if (sender != null)
-            //    {
-            //        await sender.DisposeAsync();
-            //    }
-            //    await _busClient.DisposeAsync();
-            //}
         }
     }
 }
