@@ -1,6 +1,4 @@
-﻿
-
-namespace ETicket.Bll.Services.Cashing
+﻿namespace ETicket.Bll.Services.Caching
 {
     public class CacheConfiguration
     {

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
 
-namespace ETicket.Bll.Services.Cashing
+namespace ETicket.Bll.Services.Caching
 {
     public class CacheService : ICacheService
     {
@@ -19,7 +19,7 @@ namespace ETicket.Bll.Services.Cashing
 
         public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
         {
-            string ? cachedValue = await _distributedCache.GetStringAsync(key, cancellationToken);
+            string? cachedValue = await _distributedCache.GetStringAsync(key, cancellationToken);
             if (cachedValue is null)
             {
                 return null;
@@ -39,7 +39,7 @@ namespace ETicket.Bll.Services.Cashing
 
         public async Task RemoveByPrefixAsync(string prefixKey, CancellationToken cancellationToken = default)
         {
-            IEnumerable<Task> tasks =  CacheKeys
+            IEnumerable<Task> tasks = CacheKeys
                 .Keys
                 .Where(k => k.StartsWith(prefixKey))
                 .Select(k => RemoveAsync(k, cancellationToken));
@@ -56,7 +56,7 @@ namespace ETicket.Bll.Services.Cashing
 
             await _distributedCache.SetStringAsync(key, cacheValue, new DistributedCacheEntryOptions
             {
-                SlidingExpiration = _cacheConfiguration.SlidingExpirationTimeSpan/2
+                SlidingExpiration = _cacheConfiguration.SlidingExpirationTimeSpan / 2
             }, cancellationToken);
 
             CacheKeys.TryAdd(key, false);

@@ -1,12 +1,19 @@
 ﻿
+using Azure.Messaging.ServiceBus;
+using ETicket.Api.HealthCheck;
 using ETicket.Bll.Services;
+using ETicket.Bll.Services.Caching;
 using ETicket.Bll.Services.Cart;
-using ETicket.Bll.Services.Cashing;
+using ETicket.Bll.Services.Notifications;
 using ETicket.Db.Dal;
 using ETicket.Db.Domain.Abstractions;
+using IWent.Services.Notifications.Configuration;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text.Json.Serialization;
 
 namespace ETicket.Api
@@ -19,7 +26,7 @@ namespace ETicket.Api
         {
             configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddUserSecrets<Startup>()
+                //.AddUserSecrets<Startup>()
                 .Build();
 
             Configuration = configuration;
@@ -27,7 +34,11 @@ namespace ETicket.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection = Configuration.GetConnectionString("ETicketDb");
+            var connection =
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production" ?
+                Configuration.GetConnectionString("ETicketDbProd") :
+                Configuration.GetConnectionString("ETicketDb");
+
             services.AddDbContext<ETicketDbContext>(options =>
                 options.UseSqlServer(connection));
 
@@ -64,11 +75,31 @@ namespace ETicket.Api
                 redisOption.Configuration = redisConnection;
             });
 
+            services.AddTransient(services =>
+            {
+                var configuration = services.GetRequiredService<IConfiguration>();
+                return configuration.GetRequiredSection("ServiceBus").Get<ServiceBusConfiguration>()
+                    ?? throw new InvalidOperationException($"Unable to get the '{typeof(ServiceBusConfiguration)}' from configuration.");
+            });
+
             services.AddSingleton(typeof(ICacheService), typeof(CacheService));
 
             var cacheExpiration = Configuration.GetRequiredSection("Caching").Get<CacheConfiguration>().SlidingExpirationTimeSpan;
             services.AddOutputCache(opt => opt.AddBasePolicy(builder => builder.Expire(cacheExpiration)));
             services.AddStackExchangeRedisOutputCache(options => options.Configuration = redisConnection);
+
+            var serviceBusConnectionString = Configuration.GetRequiredSection("ServiceBus").Get<ServiceBusConfiguration>().ConnectionString;
+            services.AddSingleton(provider =>
+            {
+                return new ServiceBusClient(serviceBusConnectionString);
+            });
+
+            services.AddSingleton<INotificationProducer, NotificationProducer>();
+
+            services.AddHealthChecks()
+                .AddCheck("SqlServerHealthCheck", new SqlServerHealthCheck(connection))
+                .AddCheck("ServiceBusQueueHealthCheck", new AzureServiceBusHealthCheck(serviceBusConnectionString,
+                 Configuration.GetRequiredSection("ServiceBus").Get<ServiceBusConfiguration>().QueueName), HealthStatus.Unhealthy);
 
         }
 
@@ -85,6 +116,30 @@ namespace ETicket.Api
                 endpoints.MapControllers();
             });
 
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                {
+                    ResponseWriter = async (context, report) =>
+                    {
+                        context.Response.ContentType = "application/json";
+
+                        var response = new
+                        {
+                            status = report.Status.ToString(),
+                            applicationVersion = typeof(Startup).Assembly.GetName().Version.ToString(),
+                            dependencies = report.Entries.Select(e => new
+                            {
+                                name = e.Key,
+                                status = e.Value.Status.ToString(),
+                                description = e.Value.Description
+                            }).ToArray()
+                        };
+
+                        await context.Response.WriteAsJsonAsync(response);
+                    }
+                });
+            });
             app.UseSwagger();
             app.UseSwaggerUI();
         }
